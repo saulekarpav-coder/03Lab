@@ -327,3 +327,51 @@ naive_time = (time.perf_counter() - start) * 1000
 print("BST time (ms):", bst_time)
 print("Naive time (ms):", naive_time)
 print("Results count:", len(res_bst)) 
+
+
+
+class MinHeap:
+    def __init__(self):
+        self.heap = []
+    
+    def insert(self, val):
+        self.heap.append(val)
+        self._up(len(self.heap)-1)
+    
+    def _up(self, i):
+        while i > 0:
+            parent = (i-1)//2
+            if self.heap[i] < self.heap[parent]:
+                self.heap[i], self.heap[parent] = self.heap[parent], self.heap[i]
+                i = parent
+            else:
+                break
+    
+    def extract(self):
+        if not self.heap:
+            return None
+        self.heap[0], self.heap[-1] = self.heap[-1], self.heap[0]
+        val = self.heap.pop()
+        self._down(0)
+        return val
+    
+    def _down(self, i):
+        n = len(self.heap)
+        while True:
+            smallest = i
+            left = 2*i + 1
+            right = 2*i + 2
+            
+            if left < n and self.heap[left] < self.heap[smallest]:
+                smallest = left
+            if right < n and self.heap[right] < self.heap[smallest]:
+                smallest = right
+            
+            if smallest != i:
+                self.heap[i], self.heap[smallest] = self.heap[smallest], self.heap[i]
+                i = smallest
+            else:
+                break
+    
+    def peek(self):
+        return self.heap[0] if self.heap else None
