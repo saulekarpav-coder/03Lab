@@ -375,3 +375,30 @@ class MinHeap:
     
     def peek(self):
         return self.heap[0] if self.heap else None
+    
+
+heap = MinHeap()
+k = 10
+
+import time
+
+start = time.perf_counter()
+
+for _, row in df.iterrows():
+    val = row["Weight"]
+    
+    if len(heap.heap) < k:
+        heap.insert(val)
+    elif val > heap.peek():
+        heap.extract()
+        heap.insert(val)
+
+heap_time = (time.perf_counter() - start) * 1000
+
+start = time.perf_counter()
+top_naive = sorted(df["Weight"], reverse=True)[:10]
+naive_time = (time.perf_counter() - start) * 1000
+
+print("Heap time:", heap_time)
+print("Naive time:", naive_time)
+print("Top-10 weights:", sorted(heap.heap, reverse=True))
