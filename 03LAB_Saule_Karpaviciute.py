@@ -140,3 +140,167 @@ plt.ylabel("Time (ms)")
 plt.title("Search Algorithms Benchmark")
 plt.legend()
 plt.show()
+
+#Binary search wins for large datasets because it reduces the search space logarithmically. 
+#Interpolation search can perform worse than binary search when the data is not uniformly distributed.
+#Example worst case:
+#arr = [1, 2, 3, 4, 5, 1000000]
+#Here interpolation jumps badly due to uneven distribution, making it slower than binary search.
+
+
+class Node:
+    def __init__(self, key, value):
+        self.key = key
+        self.value = value
+        self.left = None
+        self.right = None
+
+
+from collections import deque
+
+# 🔹 Node klasė (su multiple values tam pačiam key)
+class Node:
+    def __init__(self, key, value):
+        self.key = key
+        self.values = [value]   # 👈 saugom visus su tuo pačiu key
+        self.left = None
+        self.right = None
+
+
+
+class BinarySearchTree:
+    def __init__(self):
+        self.root = None
+
+    
+    def insert(self, key, value):
+        def _insert(node, key, value):
+            if node is None:
+                return Node(key, value)
+            
+            if key == node.key:
+                node.values.append(value) 
+            elif key < node.key:
+                node.left = _insert(node.left, key, value)
+            else:
+                node.right = _insert(node.right, key, value)
+            
+            return node
+        
+        self.root = _insert(self.root, key, value)
+
+
+    def search(self, key):
+        node = self.root
+        while node:
+            if key == node.key:
+                return node.values
+            elif key < node.key:
+                node = node.left
+            else:
+                node = node.right
+        return None
+
+
+    def delete(self, key):
+        def _min_value_node(node):
+            current = node
+            while current.left:
+                current = current.left
+            return current
+
+        def _delete(node, key):
+            if not node:
+                return None
+            
+            if key < node.key:
+                node.left = _delete(node.left, key)
+            elif key > node.key:
+                node.right = _delete(node.right, key)
+            else:
+            
+                if not node.left and not node.right:
+                    return None
+                
+            
+                if not node.left:
+                    return node.right
+                if not node.right:
+                    return node.left
+                
+              
+                temp = _min_value_node(node.right)
+                node.key = temp.key
+                node.values = temp.values
+                node.right = _delete(node.right, temp.key)
+            
+            return node
+        
+        self.root = _delete(self.root, key)
+
+
+    def inorder(self):
+        result = []
+        def _in(node):
+            if node:
+                _in(node.left)
+                result.extend(node.values)
+                _in(node.right)
+        _in(self.root)
+        return result
+
+
+    def preorder(self):
+        result = []
+        def _pre(node):
+            if node:
+                result.extend(node.values)
+                _pre(node.left)
+                _pre(node.right)
+        _pre(self.root)
+        return result
+
+
+    def postorder(self):
+        result = []
+        def _post(node):
+            if node:
+                _post(node.left)
+                _post(node.right)
+                result.extend(node.values)
+        _post(self.root)
+        return result
+
+
+    def bfs(self):
+        result = []
+        q = deque([self.root])
+        
+        while q:
+            node = q.popleft()
+            if node:
+                result.extend(node.values)
+                q.append(node.left)
+                q.append(node.right)
+        
+        return result
+
+
+    def range_query(self, low, high):
+        result = []
+        
+        def _range(node):
+            if not node:
+                return
+            
+            if node.key > low:
+                _range(node.left)
+            
+            if low <= node.key <= high:
+                result.extend(node.values)
+            
+            if node.key < high:
+                _range(node.right)
+        
+        _range(self.root)
+        return result
