@@ -422,7 +422,7 @@ results = {
 for n in sizes:
     df_n = df.head(n).copy()
     
-    #
+    
     arr = df_n["ID"].tolist()
     arr_sorted = sorted(arr)
     key = arr_sorted[len(arr_sorted)//2]
@@ -507,3 +507,8 @@ plt.title("All Algorithms Comparison")
 plt.legend()
 plt.grid()
 plt.show()
+
+
+#When inserting sorted values (1, 2, 3, ..., 1000), the BST becomes completely unbalanced and behaves like a linked list.
+#This causes the recursion depth to grow linearly with n, eventually exceeding Python's recursion limit and resulting in a RecursionError.
+#A better tree would maintain balance (e.g., AVL or Red-Black tree), ensuring logarithmic height and avoiding this issue.
