@@ -1,5 +1,6 @@
 
 import pandas as pd
+import time
 
 df = pd.read_csv("athlete_events.csv").sample(n=50_000, random_state=42)
 df.to_csv("athlete_events_sample.csv",index=False)
@@ -158,11 +159,11 @@ class Node:
 
 from collections import deque
 
-# 🔹 Node klasė (su multiple values tam pačiam key)
+#node klase
 class Node:
     def __init__(self, key, value):
         self.key = key
-        self.values = [value]   # 👈 saugom visus su tuo pačiu key
+        self.values = [value] #tam paciam key  
         self.left = None
         self.right = None
 
