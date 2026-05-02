@@ -81,3 +81,62 @@ def interpolation_search(arr, key):
             high = pos - 1
     
     return None
+
+import time
+import matplotlib.pyplot as plt
+
+sizes = [1000, 10000, 50000]
+
+results = {
+    "Linear": [],
+    "Binary": [],
+    "Jump": [],
+    "Interpolation": []
+}
+
+for n in sizes:
+    sample = df["ID"].head(n).tolist()
+    sample_sorted = sorted(sample)
+    key = sample_sorted[n // 2]
+    
+    # Linear
+    times = []
+    for _ in range(3):
+        start = time.perf_counter()
+        linear_search(sample, key)
+        times.append((time.perf_counter() - start) * 1000)
+    results["Linear"].append(sum(times)/3)
+    
+    # Binary
+    times = []
+    for _ in range(3):
+        start = time.perf_counter()
+        binary_search(sample_sorted, key)
+        times.append((time.perf_counter() - start) * 1000)
+    results["Binary"].append(sum(times)/3)
+    
+    # Jump
+    times = []
+    for _ in range(3):
+        start = time.perf_counter()
+        jump_search(sample_sorted, key)
+        times.append((time.perf_counter() - start) * 1000)
+    results["Jump"].append(sum(times)/3)
+    
+    # Interpolation
+    times = []
+    for _ in range(3):
+        start = time.perf_counter()
+        interpolation_search(sample_sorted, key)
+        times.append((time.perf_counter() - start) * 1000)
+    results["Interpolation"].append(sum(times)/3)
+
+# Plot
+for name, vals in results.items():
+    plt.plot(sizes, vals, label=name)
+
+plt.xlabel("n")
+plt.ylabel("Time (ms)")
+plt.title("Search Algorithms Benchmark")
+plt.legend()
+plt.show()
