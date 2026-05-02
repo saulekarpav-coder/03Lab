@@ -304,3 +304,26 @@ class BinarySearchTree:
         
         _range(self.root)
         return result
+    
+df = df.sample(frac=1, random_state=42)
+
+
+bst = BinarySearchTree()
+
+for _, row in df.iterrows():
+    bst.insert(row["Year"], row.to_dict())
+
+
+low, high = 2000, 2010
+
+start = time.perf_counter()
+res_bst = bst.range_query(low, high)
+bst_time = (time.perf_counter() - start) * 1000
+
+start = time.perf_counter()
+res_naive = df[(df["Year"] >= low) & (df["Year"] <= high)].to_dict("records")
+naive_time = (time.perf_counter() - start) * 1000
+
+print("BST time (ms):", bst_time)
+print("Naive time (ms):", naive_time)
+print("Results count:", len(res_bst)) 
