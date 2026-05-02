@@ -402,3 +402,108 @@ naive_time = (time.perf_counter() - start) * 1000
 print("Heap time:", heap_time)
 print("Naive time:", naive_time)
 print("Top-10 weights:", sorted(heap.heap, reverse=True))
+
+#A heap is ideal for top-k because it keeps only the best k elements and updates efficiently in O(log k). 
+#However, it is poor for finding a specific element because it does not maintain full order, so searching requires O(n).
+
+
+
+sizes = [1000, 10000, 50000]
+
+results = {
+    "Linear": [],
+    "Binary": [],
+    "Jump": [],
+    "Interpolation": [],
+    "BST Range": [],
+    "Heap Top-K": []
+}
+
+for n in sizes:
+    df_n = df.head(n).copy()
+    
+    #
+    arr = df_n["ID"].tolist()
+    arr_sorted = sorted(arr)
+    key = arr_sorted[len(arr_sorted)//2]
+    
+    #Linear ----
+    times = []
+    for _ in range(3):
+        start = time.perf_counter()
+        linear_search(arr, key)
+        times.append((time.perf_counter() - start)*1000)
+    results["Linear"].append(sum(times)/3)
+    
+    #Binary ----
+    times = []
+    for _ in range(3):
+        start = time.perf_counter()
+        binary_search(arr_sorted, key)
+        times.append((time.perf_counter() - start)*1000)
+    results["Binary"].append(sum(times)/3)
+    
+    #Jump ----
+    times = []
+    for _ in range(3):
+        start = time.perf_counter()
+        jump_search(arr_sorted, key)
+        times.append((time.perf_counter() - start)*1000)
+    results["Jump"].append(sum(times)/3)
+    
+    #Interpolation ----
+    times = []
+    for _ in range(3):
+        start = time.perf_counter()
+        interpolation_search(arr_sorted, key)
+        times.append((time.perf_counter() - start)*1000)
+    results["Interpolation"].append(sum(times)/3)
+    
+    
+    #BST
+    bst = BinarySearchTree()
+    
+    df_shuffled = df_n.sample(frac=1, random_state=42)
+    
+    for _, row in df_shuffled.iterrows():
+        bst.insert(row["Year"], row.to_dict())
+    
+    low, high = 2000, 2010
+    
+    start = time.perf_counter()
+    bst.range_query(low, high)
+    bst_time = (time.perf_counter() - start) * 1000
+    
+    results["BST Range"].append(bst_time)
+    
+    
+    #HEAP
+    heap = MinHeap()
+    k = 10
+    
+    start = time.perf_counter()
+    
+    for _, row in df_n.iterrows():
+        val = row["Weight"]
+        
+        if len(heap.heap) < k:
+            heap.insert(val)
+        elif val > heap.peek():
+            heap.extract()
+            heap.insert(val)
+    
+    heap_time = (time.perf_counter() - start) * 1000
+    
+    results["Heap Top-K"].append(heap_time)
+
+
+
+for name, vals in results.items():
+    plt.plot(sizes, vals, marker='o', label=name)
+
+plt.xlabel("n")
+plt.ylabel("Time (ms)")
+plt.title("All Algorithms Comparison")
+plt.legend()
+plt.grid()
+plt.show()
